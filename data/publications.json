@@ -1,0 +1,28 @@
+[
+    {
+        "id_rawdata": 2,
+        "rawdata_insertion_datetime": "2025-08-31 10:30:15.123456",
+        "source": "FINANCIAL_NEWS_API",
+        "publication_id": "FN987654",
+        "published_date": "2025-08-29 09:00:00",
+        "publication_type": "Sector Analysis",
+        "title": "US Tech Stocks: Navigating Q4 Volatility",
+        "attachment.title": "20250829_Analysis_US_Tech_Q4_Outlook.pdf",
+        "summary": "Our latest analysis suggests a cautious outlook for the US tech sector in the fourth quarter, with rising interest rates and supply chain concerns posing significant headwinds. We identify key stocks positioned for resilience.",
+        "attachment.content": "<p><b>EXECUTIVE SUMMARY:</b> The US technology sector faces a challenging Q4 amid macroeconomic pressures. This report details risks and opportunities for investors.</p>",
+        "attachment.content_type": "application/pdf",
+        "attachment.author": "Jane Doe",
+        "tags.authors": ["Jane Doe", "John Smith"],
+        "tags.region": "North America",
+        "tags.asset_class": "Equities",
+        "tags.currencies": "USD",
+        "Language": "English",
+        "alfrescoIds": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "store_filename": "/data/reports/processed/FN987654_final.pdf",
+        "time_decay_in_days": 90,
+        "expiration_date": "2025-11-27 09:00:00",
+        "extracted_content": "US Tech Stocks: Navigating Q4 Volatility\\n\\nOur latest analysis suggests a cautious outlook for the US tech sector in the fourth quarter, with rising interest rates and supply chain concerns posing significant headwinds...",
+        "hash": "a1b2c3d4e5f67890a1b2c3d4e5f67890a1b2c3d4e5f67890a1b2c3d4e5f67890"
+      }
+      
+]

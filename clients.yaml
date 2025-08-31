@@ -1,0 +1,18 @@
+[
+  {
+    "sales_name"             : "John Doe",
+    "sales_email"            : "john.doe@example.com",
+    "company"                : "Example Inc.",
+    "client_names"           : ["Jane Doe"],
+    "emails"                 : ["jane.doe@example.com"],
+    "client_ids"             : ["1234567890"],
+    "bbg_chat_company_names" : ["Example Inc."],
+    "bbg_chat_sales_names"   : ["John Doe"],
+    "rfq_company_names"      : ["Example Inc."],
+    "crm_company_names"      : ["Example Inc."],
+    "is_private"             : false,
+    "chat_sources"           : ["BBG"],
+    "added_to_pipeline"      : true,
+    "schedule_region"        : "ASIA"
+  }
+]
