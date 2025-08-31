@@ -63,3 +63,17 @@ def generate_topics_prompt():
         ]
     }"""
 
+
+def generate_instruments_prompt():
+    return """{
+        "task": "Extract up to 10 financial instruments explicitly discussed in article_content",
+        "notes": [
+            "Examples: options, swaps, CDS, futures, forwards, spot, convertible bonds, ELN, ETFs",
+            "Prefer instrument types over generic words like 'derivatives' unless only generic is present",
+            "Do not include currencies here",
+            "Return empty string if none"
+        ],
+        "article_content": "{% raw %}{{ article_content }}{% endraw %}",
+        "output_format": "List of instruments separated by semi-colon"
+    }"""
+

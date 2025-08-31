@@ -7,19 +7,22 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from settings import settings
 from prompts.publication import (generate_keywords_prompt,
                                  generate_currencies_prompt, 
-                                 generate_topics_prompt)
+                                 generate_topics_prompt,
+                                 generate_instruments_prompt)
 from cores.llm_functions import call_llm
 
 
 def publication_feature_extraction(pub_df: pd.DataFrame):
     
-    llm_extract_topics_partial      = partial(call_llm, prompt_template=generate_topics_prompt())
-    llm_extract_keywords_partial    = partial(call_llm, prompt_template=generate_keywords_prompt())
-    llm_extract_currencies_partial  = partial(call_llm, prompt_template=generate_currencies_prompt())
+    llm_extract_topics_partial       = partial(call_llm, prompt_template=generate_topics_prompt())
+    llm_extract_keywords_partial     = partial(call_llm, prompt_template=generate_keywords_prompt())
+    llm_extract_currencies_partial   = partial(call_llm, prompt_template=generate_currencies_prompt())
+    llm_extract_instruments_partial  = partial(call_llm, prompt_template=generate_instruments_prompt())
 
-    pub_df.loc[:, "llm_extract_topics"]     = pub_df.loc[:, "clean_content"].apply(llm_extract_topics_partial)
-    pub_df.loc[:, "llm_extract_keywords"]   = pub_df.loc[:, "clean_content"].apply(llm_extract_keywords_partial)
-    pub_df.loc[:, "llm_extract_currencies"] = pub_df.loc[:, "clean_content"].apply(llm_extract_currencies_partial)
+    pub_df.loc[:, "llm_extract_topics"]       = pub_df.loc[:, "clean_content"].apply(llm_extract_topics_partial)
+    pub_df.loc[:, "llm_extract_keywords"]     = pub_df.loc[:, "clean_content"].apply(llm_extract_keywords_partial)
+    pub_df.loc[:, "llm_extract_currencies"]   = pub_df.loc[:, "clean_content"].apply(llm_extract_currencies_partial)
+    pub_df.loc[:, "llm_extract_instruments"]  = pub_df.loc[:, "clean_content"].apply(llm_extract_instruments_partial)
 
     return pub_df
 
@@ -32,7 +35,8 @@ def publication_preprocessing(pub_df: pd.DataFrame):
                        "Publication asset class: {asset_class}\n\n"
                        "Publication keywords: {llm_extract_keywords}\n\n"
                        "Publication currencies: {llm_extract_currencies}\n\n"
-                       "Publication topics: {llm_extract_topics}\n\n")
+                       "Publication topics: {llm_extract_topics}\n\n"
+                       "Publication instruments: {llm_extract_instruments}\n\n")
     
     publications = pub_df.apply(lambda row: Document(page_content=row["clean_content"],
                                                      metadata=row),
@@ -54,6 +58,7 @@ def publication_preprocessing(pub_df: pd.DataFrame):
                                                          asset_class=text_chunk.metadata["asset_class"],
                                                          llm_extract_keywords=text_chunk.metadata["llm_extract_keywords"],
                                                          llm_extract_currencies=text_chunk.metadata["llm_extract_currencies"],
-                                                         llm_extract_topics=text_chunk.metadata["llm_extract_topics"])
+                                                         llm_extract_topics=text_chunk.metadata["llm_extract_topics"],
+                                                         llm_extract_instruments=text_chunk.metadata.get("llm_extract_instruments", ""))
 
     return text_chunks

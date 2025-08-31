@@ -14,9 +14,10 @@ from cores.llm_functions import call_llm
 
 def chat_feature_extraction(client_profile: dict, chat_history_df: pd.DataFrame):
 
-    chat_history = [chat for chat in chat_history_df["chat"]]
+    chat_history = chat_history_df.to_dict(orient="records")
 
-    call_llm_client_template = partial(call_llm, prompt_inputs={"chat_history": "\n\n".join(chat_history)}, template_type="jinja2")
+    chat_text = "\n\n".join([str(item.get("chat", "")) for item in chat_history])
+    call_llm_client_template = partial(call_llm, prompt_inputs={"chat_history": chat_text}, template_type="jinja2")
 
     prompt_templates = [
         ("chat_summary", generate_chat_summary_prompt()),
@@ -29,7 +30,7 @@ def chat_feature_extraction(client_profile: dict, chat_history_df: pd.DataFrame)
         return call_llm_client_template(prompt_template=prompt_template)
     
 
-    with ThreadPoolExecutor(max_workers=settings.max_worker) as executor:
+    with ThreadPoolExecutor(max_workers=min(4, settings.max_worker)) as executor:
         futures = {executor.submit(call_llm_client, prompt_template): column_name for column_name, prompt_template in prompt_templates}
 
         for future in futures:
@@ -39,7 +40,7 @@ def chat_feature_extraction(client_profile: dict, chat_history_df: pd.DataFrame)
                 client_profile[column_name] = result
             except Exception as e:
                 logger.error(f"Error calling LLM client for {column_name}: {e}")
-            client_profile[column_name] = future.result()
+                client_profile[column_name] = ""
 
     # Initialize Azure OpenAI Embeddings
     embeddings = AzureOpenAIEmbeddings(
@@ -48,7 +49,7 @@ def chat_feature_extraction(client_profile: dict, chat_history_df: pd.DataFrame)
         openai_api_version=settings.azure_openai_embeddings_api_version,
         openai_api_key=settings.azure_openai_embeddings_api_key,
     )
-    chat_history_documents = [Document(page_content=chat_item.get("msg", ""), metadata=chat_item) for chat_item in chat_history]
+    chat_history_documents = [Document(page_content=str(chat_item.get("chat", chat_item.get("msg", ""))), metadata=chat_item) for chat_item in chat_history]
 
     vectorstore = FAISS.from_documents(chat_history_documents, embeddings)
 
@@ -61,12 +62,16 @@ def chat_feature_extraction(client_profile: dict, chat_history_df: pd.DataFrame)
         }
     )
 
-    query = " ".join([client_profile["chat_interest"], client_profile["chat_products"], client_profile["chat_currencies"]])
+    query = " ".join(filter(None, [client_profile.get("chat_interest", ""), client_profile.get("chat_products", ""), client_profile.get("chat_currencies", "")]))
     relevant_chat_documents = retriever.invoke(query)
-    relevant_chats = [doc.metadata['chat'] for doc in relevant_chat_documents]
+    relevant_chats = [doc.metadata.get('chat', doc.metadata.get('msg', '')) for doc in relevant_chat_documents]
 
     client_profile["chat_history"] = relevant_chats
-    client_profile["original_chat_history"] = chat_history[["name", "company_name", "msg", "type"]].to_dict("records")
+    try:
+        original_cols = ["name", "company_name", "msg", "type"]
+        client_profile["original_chat_history"] = [{k: item.get(k, "") for k in original_cols} for item in chat_history]
+    except Exception:
+        client_profile["original_chat_history"] = chat_history
 
     return client_profile
     

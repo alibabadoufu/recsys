@@ -45,4 +45,9 @@ class Settings(BaseSettings):
     # Recsys
     output_file_path : str = "results/recsys_output_{date}.csv"
 
+    # Precision filtering
+    precision_min_score: int = 5
+    precision_min_confidence: float = 0.5
+    precision_top_k: int = 30
+
 settings = Settings()
